@@ -54,6 +54,12 @@ def getMakes(conn, c):
         # print(dict(zip([val.get('value')], [val.text])))
 
     dic = zip(value, make)
+
+    # Delete all Data from the table Makes
+    c.execute("DELETE FROM Makes")
+    conn.commit()
+
+    # Insert new Data into table Makes
     c.executemany("INSERT INTO Makes VALUES(?,?) ", dic)
     conn.commit()
     c.close()
@@ -75,9 +81,6 @@ def InitSqlServer():
         createTable(conn, sql_create_makes_table)
     else:
         print("Failed to create db table Makes")
-
-    c.execute("DELETE FROM Makes")
-    conn.commit()
 
     # Inserts the makes and ID's in the table Makes
     getMakes(conn, c)
