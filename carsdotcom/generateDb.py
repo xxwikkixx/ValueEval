@@ -1,32 +1,27 @@
-import pandas as pd
+import threading
 import bs4 as bs
 import urllib.request
 import sqlite3
 from sqlite3 import Error
-from pathlib import Path
-
-def createConnection(dbFile):
-    """
-    create a database connection to the SQLite database specified by db_file
-    :param dbFile: database file
-    :return: Connection object or None
-    """
-    conn = None
-    try:
-        conn = sqlite3.connect(dbFile)
-        print(sqlite3.version)
-    except Error as e:
-        print(e)
-    return conn
 
 
+# URL
+carsdotcom = "https://www.cars.com/"
+# Source is the URL of the website that will be scraped
+source = urllib.request.urlopen(carsdotcom)
+# Soup stores the raw html page being scraped
+soup = bs.BeautifulSoup(source, 'lxml')
+
+dbPath = "../Databases/carsdotcom.db"
+
+
+"""
+create a table from the create_table_sql statement
+:param conn: Connection object
+:param createTableSql: a CREATE TABLE statement
+:return:
+"""
 def createTable(conn, createTableSql):
-    """
-    create a table from the create_table_sql statement
-    :param conn: Connection object
-    :param createTableSql: a CREATE TABLE statement
-    :return:
-    """
     try:
         c = conn.cursor()
         c.execute(createTableSql)
@@ -34,16 +29,12 @@ def createTable(conn, createTableSql):
         print(e)
 
 
-def getMakes(conn, c):
-    carsdotcom = "https://www.cars.com/"
-    # Source is the URL of the website that will be scraped
-    source = urllib.request.urlopen(carsdotcom)
-    # Soup stores the raw html page being scraped
-    soup = bs.BeautifulSoup(source, 'lxml')
-
-    # Finds the "select" drop down tag
-    # select has the attribute of "name":"makeId"
-    # Options variable is a list
+"""
+Finds the "select" drop down tag
+select has the attribute of "name":"makeId"
+Options variable is a list
+"""
+def getMakes():
     value = []
     make = []
     option = soup.find("select", {"name":"makeId"}).findAll('option')
@@ -55,40 +46,72 @@ def getMakes(conn, c):
 
     dic = zip(value, make)
 
-    # Delete all Data from the table Makes
-    c.execute("DELETE FROM Makes")
-    conn.commit()
+    try:
+        conn = sqlite3.connect(dbPath)
+        print(sqlite3.version)
+        c = conn.cursor()
+    except Error as e:
+        print(e)
+
+
 
     # Insert new Data into table Makes
-    c.executemany("INSERT INTO Makes VALUES(?,?) ", dic)
+    c.executemany("INSERT INTO Makes VALUES(NULL,?,?) ", dic)
     conn.commit()
     c.close()
     conn.close()
 
 
-def InitSqlServer():
-    dbPath = "../Databases/carsdotcom.db"
+def getModels():
+    # Query SQL Makes
+    # Initialize counter for ID
+    # First ID is first Make
+    pass
 
-    sql_create_makes_table = """CREATE TABLE IF NOT EXISTS "Makes" (
-                                "makeId"	INTEGER NOT NULL,
-	                            "name"	TEXT NOT NULL,
-	                            PRIMARY KEY("makeId")
+
+def initSqlTables():
+    # sql_create_makes_table = """
+    #                         CREATE TABLE IF NOT EXISTS Makes (
+    #                         "makeId"	INTEGER NOT NULL,
+    #                         "name"	TEXT NOT NULL,
+    #                         PRIMARY KEY (makeId)
+    #                     ); """
+
+    sql_create_makes_table = """
+                            CREATE TABLE IF NOT EXISTS Makes(
+                            "id"	INTEGER PRIMARY KEY AUTOINCREMENT,
+                            "makeId"	INTEGER NOT NULL,
+                            "name"	TEXT NOT NULL
                         ); """
 
-    conn = createConnection(dbPath)
-    c = conn.cursor()
+    sql_create_model_table = """
+                            CREATE TABLE IF NOT EXISTS Models(
+                            "id"	INTEGER PRIMARY KEY AUTOINCREMENT,
+                            "makeId"	INTEGER NOT NULL,
+                            "modelId"	INTEGER NOT NULL,
+                            "name"	TEXT NOT NULL
+                        );"""
+
+    try:
+        conn = sqlite3.connect(dbPath)
+        print("Initialized SQL Tables " + sqlite3.version)
+        c = conn.cursor()
+    except Error as e:
+        print(e)
+
+    # Delete all Data from the tables
+    c.execute("DROP TABLE Makes")
+    conn.commit()
+    c.execute("DROP TABLE Models")
+    conn.commit()
+
     if conn is not None:
         createTable(conn, sql_create_makes_table)
+        createTable(conn, sql_create_model_table)
     else:
-        print("Failed to create db table Makes")
-
-    # Inserts the makes and ID's in the table Makes
-    getMakes(conn, c)
+        print("Failed to create db tables")
 
 
-
-
-# TO-DO:
-# Change the path to be generated without being hardcoded
 if __name__ == "__main__" :
-    InitSqlServer()
+    initSqlTables()
+    getMakes()
