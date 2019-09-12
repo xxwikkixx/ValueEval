@@ -1,5 +1,6 @@
 import bs4 as bs
 import urllib.request
+import mysql.connector
 
 # Video tutorial to follow
 # https://www.youtube.com/watch?v=aIPqt-OdmS0
