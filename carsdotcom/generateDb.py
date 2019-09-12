@@ -34,7 +34,7 @@ def createTable(conn, createTableSql):
         print(e)
 
 
-def getMakes():
+def getMakes(conn, c):
     carsdotcom = "https://www.cars.com/"
     # Source is the URL of the website that will be scraped
     source = urllib.request.urlopen(carsdotcom)
@@ -52,10 +52,15 @@ def getMakes():
         make.append(val.text)
         # print(val.get('value'), val.text)
         # print(dict(zip([val.get('value')], [val.text])))
-    return value, make
+
+    dic = zip(value, make)
+    c.executemany("INSERT INTO Makes VALUES(?,?) ", dic)
+    conn.commit()
+    c.close()
+    conn.close()
 
 
-def sqlserver():
+def InitSqlServer():
     dbPath = "../Databases/carsdotcom.db"
 
     sql_create_makes_table = """CREATE TABLE IF NOT EXISTS "Makes" (
@@ -74,16 +79,13 @@ def sqlserver():
     c.execute("DELETE FROM Makes")
     conn.commit()
 
-    a,b = getMakes()
-    dic = zip(a,b)
-    c.executemany("INSERT INTO Makes VALUES(?,?) " ,dic)
-    conn.commit()
-    c.close()
-    conn.close()
+    # Inserts the makes and ID's in the table Makes
+    getMakes(conn, c)
+
 
 
 
 # TO-DO:
 # Change the path to be generated without being hardcoded
 if __name__ == "__main__" :
- sqlserver()
+    InitSqlServer()
