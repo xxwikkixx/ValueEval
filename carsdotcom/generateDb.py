@@ -3,7 +3,7 @@ import platform
 import bs4 as bs
 import urllib.request
 import sqlite3
-import numpy as np
+import queue
 from sqlite3 import Error
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
@@ -87,7 +87,7 @@ def getModels(carMake):
         driver = webdriver.Chrome(executable_path=r'C:\chromedriver.exe', options=options)
     elif platform.system() == "Linux" or platform.system() == "Linux2":
         driver = webdriver.Chrome(options=options)
-    # driver = webdriver.Chrome(options=options)
+
     driver.get(carsdotcom)
 
     select = Select(driver.find_element_by_name('makeId'))
@@ -153,6 +153,19 @@ def initSqlTables():
         print("Failed to create db tables")
 
 
+thread_start = 15
+my_queue = queue.Queue()
+def worker():
+    '''
+    Starts up worker threads for each element in the queue
+    only runs maximum of thread_start times
+    :return:
+    '''
+    while not my_queue.empty():
+        data = my_queue.get()
+        getModels(data)
+        my_queue.task_done()
+
 if __name__ == "__main__" :
     # Start the initSqlTables first to create all tables
     # initSqlTables()
@@ -164,11 +177,12 @@ if __name__ == "__main__" :
     # Initalize list with options values of each make
     carsdotcomOptionVal, carsdotcomOptionMakes = getMakes()
 
-    threads = []
-    for makesOptions in carsdotcomOptionVal[:10]:
-        th = threading.Thread(target=getModels, args=[makesOptions])
-        th.start()
-        threads.append(th)
+    for i in carsdotcomOptionVal:
+        my_queue.put(i)
 
-    for thread in threads:
-        thread.join()
+    for i in range(thread_start):
+        # daemon means that all threads will exit when the main thread exits
+        t = threading.Thread(target=worker, daemon=True)
+        t.start()
+
+    my_queue.join()
