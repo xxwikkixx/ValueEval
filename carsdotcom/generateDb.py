@@ -85,7 +85,6 @@ def getModels(carMake):
     elif platform.system() == "Linux" or platform.system() == "Linux2":
         driver = webdriver.Chrome(options=options)
 
-
     driver.get(carsdotcom)
 
     select = Select(driver.find_element_by_name('makeId'))
