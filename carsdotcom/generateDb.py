@@ -1,4 +1,5 @@
 import threading
+import platform
 import bs4 as bs
 import urllib.request
 import sqlite3
@@ -79,7 +80,12 @@ def getModels(carMake):
     prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096 }
     options.add_experimental_option("prefs", prefs)
 
-    driver = webdriver.Chrome(options=options)
+    if platform.system() == "Windows":
+        driver = webdriver.Chrome(executable_path=r'C:\chromedriver.exe', options=options)
+    elif platform.system() == "Linux" or platform.system() == "Linux2":
+        driver = webdriver.Chrome(options=options)
+
+
     driver.get(carsdotcom)
 
     select = Select(driver.find_element_by_name('makeId'))
