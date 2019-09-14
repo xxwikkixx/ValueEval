@@ -97,14 +97,6 @@ def getModels(carMake):
     print(model)
     driver.quit()
 
-    # for option in select:
-    #     if option.text == carMake:
-    #         option.click()  # select() for older versions
-    #         print(option.text)
-    #         break
-
-
-
 
 def initSqlTables():
     """
