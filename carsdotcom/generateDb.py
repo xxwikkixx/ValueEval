@@ -3,6 +3,7 @@ import platform
 import bs4 as bs
 import urllib.request
 import sqlite3
+import numpy as np
 from sqlite3 import Error
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
@@ -63,6 +64,8 @@ def getMakes():
     c.close()
     conn.close()
 
+    return value, make
+
 
 def getModels(carMake):
     """
@@ -84,7 +87,7 @@ def getModels(carMake):
         driver = webdriver.Chrome(executable_path=r'C:\chromedriver.exe', options=options)
     elif platform.system() == "Linux" or platform.system() == "Linux2":
         driver = webdriver.Chrome(options=options)
-
+    # driver = webdriver.Chrome(options=options)
     driver.get(carsdotcom)
 
     select = Select(driver.find_element_by_name('makeId'))
@@ -151,7 +154,21 @@ def initSqlTables():
 
 
 if __name__ == "__main__" :
+    # Start the initSqlTables first to create all tables
     # initSqlTables()
+
+    # Start scraping the Makes of the cars from cars.com
     # getMakes()
 
-    getModels("20001")
+    # Get the list of makes from getMakes()
+    # Initalize list with options values of each make
+    carsdotcomOptionVal, carsdotcomOptionMakes = getMakes()
+
+    threads = []
+    for makesOptions in carsdotcomOptionVal[:10]:
+        th = threading.Thread(target=getModels, args=[makesOptions])
+        th.start()
+        threads.append(th)
+
+    for thread in threads:
+        thread.join()
