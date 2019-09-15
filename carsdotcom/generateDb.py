@@ -4,6 +4,7 @@ import bs4 as bs
 import urllib.request
 import sqlite3
 import queue
+import itertools
 from sqlite3 import Error
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
@@ -53,7 +54,7 @@ def getMakes():
 
     try:
         conn = sqlite3.connect(dbPath)
-        print(sqlite3.version)
+        print("Get Makes " + sqlite3.version)
         c = conn.cursor()
     except Error as e:
         print(e)
@@ -101,8 +102,25 @@ def getModels(carMake):
     for option in dropdown_options[1:]:
         value.append(option.get_attribute('value'))
         model.append(option.text)
-    print(value)
-    print(model)
+
+    dic = zip(itertools.repeat(carMake), value, model)
+    dic = set(dic)
+
+
+    # try:
+    #     conn = sqlite3.connect(dbPath)
+    #     print("Get Makes " + sqlite3.version)
+    #     c = conn.cursor()
+    # except Error as e:
+    #     print(e)
+    #
+    # # Insert new Data into table Makes
+    # c.execute("INSERT INTO Models VALUES(NULL,?,?,?) ", dic)
+    # conn.commit()
+    # c.close()
+    # conn.close()
+
+    print(dic)
     driver.quit()
 
 
@@ -141,9 +159,9 @@ def initSqlTables():
         print(e)
 
     # Delete all Data from the tables
-    c.execute("DROP TABLE Makes")
+    c.execute("DROP TABLE IF EXISTS Makes")
     conn.commit()
-    c.execute("DROP TABLE Models")
+    c.execute("DROP TABLE IF EXISTS Models")
     conn.commit()
 
     if conn is not None:
@@ -153,7 +171,7 @@ def initSqlTables():
         print("Failed to create db tables")
 
 
-thread_start = 15
+thread_start = 20
 my_queue = queue.Queue()
 def worker():
     '''
@@ -166,12 +184,13 @@ def worker():
         getModels(data)
         my_queue.task_done()
 
+
 if __name__ == "__main__" :
     # Start the initSqlTables first to create all tables
-    # initSqlTables()
+    initSqlTables()
 
     # Start scraping the Makes of the cars from cars.com
-    # getMakes()
+    getMakes()
 
     # Get the list of makes from getMakes()
     # Initalize list with options values of each make

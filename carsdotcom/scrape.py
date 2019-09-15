@@ -1,9 +1,6 @@
 import bs4 as bs
 import urllib.request
 
-# Video tutorial to follow
-# https://www.youtube.com/watch?v=aIPqt-OdmS0
-
 # Generates a dynamic URL for cars.com
 def generateURL(makeId, modelId, perPage, radius, sort, zipCode):
     # MakeID = BMW = 20005
@@ -58,5 +55,4 @@ def tutorialTest():
 
 
 if __name__ == "__main__" :
-    print("Starting Scraper for Car.com!")
-    print("Scraping BMW M3's")
+    pass
