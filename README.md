@@ -2,12 +2,12 @@
 
 ***
 #### Websites to be scraped
-* Cars.com
+1. Cars.com
 ⋅⋅* ~~Front page drop down Car Makes and their Models~~
 ⋅⋅* 
 
-* Ebay.com
+2. Ebay.com
 ⋅⋅*
 
-* Autotrader.com
+3. Autotrader.com
 ⋅⋅*
