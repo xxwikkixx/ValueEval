@@ -1,5 +1,13 @@
 # ValueEval
 
-Flask Application
+***
+#### Websites to be scraped
+* Cars.com
+⋅⋅* ~~Front page drop down Car Makes and their Models~~
+⋅⋅* 
 
-Use Text editor or Pycharm
+* Ebay.com
+⋅⋅*
+
+* Autotrader.com
+⋅⋅*
