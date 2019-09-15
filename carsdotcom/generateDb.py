@@ -102,9 +102,9 @@ def getModels(carMake):
     for option in dropdown_options[1:]:
         value.append(option.get_attribute('value'))
         if '-' in option.text:
-            model.append(option.text.replace('-', ''))
+            model.append(option.text.replace('-', '').strip())
         else:
-            model.append(option.text)
+            model.append(option.text.strip())
 
     dic = list(zip(value, model))
 
