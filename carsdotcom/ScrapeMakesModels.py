@@ -4,7 +4,6 @@ import bs4 as bs
 import urllib.request
 import sqlite3
 import queue
-import itertools
 from sqlite3 import Error
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
