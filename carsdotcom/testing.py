@@ -1,9 +1,6 @@
 import bs4 as bs
 import urllib.request
-import carsdotcom
-
-
-
+from carsdotcom import Car
 
 def tutorialTest():
     # Output the Title(title) of the website with the name(string or text)
@@ -38,6 +35,21 @@ def tutorialTest():
     #     print(div.text)
     pass
 
+# Generates a dynamic URL for cars.com
+def generateURL(makeId, modelId, perPage, radius, sort, zipCode):
+    '''
+    :param makeId: MakeID = BMW = 20005
+    :param modelId: ModelID = M3 = 21392
+    :param perPage: PerPage = 100
+    :param radius: Sort = year-newest
+    :param sort: ZipCode = 19002
+    :param zipCode: Radius = 99999 for max range
+    :return: carUrl
+    '''
+    carUrl = "https://www.cars.com/for-sale/searchresults.action/?dealerType=all&mdId=" \
+             + modelId + "&mkId=" + makeId + "&page=1&perPage=" + perPage + "&rd=" \
+             + radius + "&searchSource=PAGINATION&sort=" + sort + "&zc=" + zipCode
+    return carUrl
 
 def getlistiingURL():
     # Source is the URL of the website that will be scraped
@@ -79,7 +91,7 @@ def getPrice():
 
 
 if __name__ == "__main__" :
-    # test = carsdotcom.Car()
+    # test = Car
     # print(test)
     # print(carsdotcom.generateURL('1','1','1','1','1','1'))
 
