@@ -1,6 +1,6 @@
 import bs4 as bs
 import urllib.request
-from carsdotcom import Car
+
 
 def tutorialTest():
     # Output the Title(title) of the website with the name(string or text)
@@ -60,44 +60,44 @@ def getlistiingURL():
     for url in soup.find_all('a', class_='shop-srp-listings__listing'):
         print(url.get('href'))
 
-def getBasics():
-    # Source is the URL of the website that will be scraped
-    source = urllib.request.urlopen(
-        "https://www.cars.com/vehicledetail/detail/786646952/overview/")
-    # Soup stores the raw html page being scraped
-    soup = bs.BeautifulSoup(source, 'lxml')
-    for div in soup.find_all('ul', class_='vdp-details-basics__list'):
-        print(div.text)
 
-def getFeatures():
-    # Source is the URL of the website that will be scraped
+def getFullCar():
     source = urllib.request.urlopen(
-        "https://www.cars.com/vehicledetail/detail/786646952/overview/")
+        "https://www.cars.com/for-sale/searchresults.action/?dealerType=all&" \
+        "mdId=21392&" \
+        "mkId=20005&" \
+        "page=1&perPage=100&" \
+        "rd=99999&" \
+        "searchSource=GN_REFINEMENT&sort=relevance&yrId=20199&zc=19002")
     # Soup stores the raw html page being scraped
     soup = bs.BeautifulSoup(source, 'lxml')
-    # test = soup.find('div', class_='cui-accordion-section__content')
-    # print(test.text)
-    for div in soup.find_all('ul', class_='vdp-details-basics__features-list'):
-        print(div.text)
 
-def getPrice():
-    # Source is the URL of the website that will be scraped
-    source = urllib.request.urlopen(
-        "https://www.cars.com/vehicledetail/detail/786646952/overview/")
-    # Soup stores the raw html page being scraped
-    soup = bs.BeautifulSoup(source, 'lxml')
-    test = soup.find('div', class_='vehicle-info__price')
-    print(test.text)
+    StockType = []
+    Title = []
+    Price = []
+    Miles = []
+    Info = []
+    Dealer = []
+
+    infs = []
+
+    for cars in soup.find_all('div', attrs={'id':'srp-listing-rows-container'}):
+        stocktype = cars.find('div', class_='listing-row__stocktype')
+        title = cars.find('h2', class_='listing-row__title')
+        price = cars.find('span', class_='listing-row__price')
+        miles = cars.find('span', class_='listing-row__mileage')
+        for inf in soup.find_all('ul', class_='listing-row__meta'):
+            infs.append(inf.text)
+        dealer = cars.find('div', class_='listing-row__dealer__basic-details')
+
+        StockType.append(stocktype.text.strip())
+        Title.append(title.text.strip())
+        Price.append(price.text.strip())
+        Miles.append(miles.text.strip())
+        Info.append(infs)
+        Dealer.append(dealer.text.strip())
+    print(StockType, Title, Price, Miles, Info, Dealer)
 
 
 if __name__ == "__main__" :
-    # test = Car
-    # print(test)
-    # print(carsdotcom.generateURL('1','1','1','1','1','1'))
-
-    # getlistiingURL()
-
-    for i in range(10):
-        print(i)
-
-
+    getFullCar()
